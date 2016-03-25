@@ -21,14 +21,6 @@ class Node():
         node.action = action
         node.path_cost = self.path_cost + problem.cost(self.state, action)
         return node
-    
-    def parent(self, problem, action):
-        """Creates a parent for backward search"""
-        node = Node()
-        node.state = problem.result(self.state, action)
-        node.child = self
-        node.action = action
-        return node
         
     def solution(self):
         """Returns the chain of actions which leads to this node"""
@@ -38,14 +30,6 @@ class Node():
             solution.appendleft(node.action)
             node = node.parent
         return solution
-    
-    def compose_solution(problem, forward_node, backward_node):
-        """combines a forward path and a backward path sharing the same last node"""
-        aux = backward_node
-        while aux.child != None:
-            node = forward_node.child(problem, problem.reverse(backward_node))
-            aux = backward_node.child
-        return node
         
     def reverse_path(self):
         """generates the reverse path that leads to this node"""
@@ -80,7 +64,43 @@ class Node():
     def __repr__(self):
         return "state:{}, path_cost:{}, path:{}".format(
             self.state, self.path_cost, self.solution())
+
+class Reverse_node():
+    def __init__(self, problem = None):
+        self.state = problem and problem.goal
+        self.child = None
+        self.action = None
+        self.path_cost = 0    
+    
+    def parent(self, problem, action):
+        """Creates a parent for backward search."""
+        node = Node()
+        node.state = problem.result(self.state, action)
+        node.child = self
+        node.action = problem.reverse_action(self.state, action)
+        node.path_cost = self.path_cost + problem.cost(node.state, node.action)
+        return node
+    
+    def solution(self):
+        """
+        Returns the path of actions from current node to goal.
+        """
+        solution = []
+        node = self
+        while node.child != None:
+            solution.append(node.action)
+        return solution
         
+    def __repr__(self):
+        return "state:{}, path_cost:{}, path:{}".format(
+            self.state, self.path_cost, self.solution())
+
+def compose_solution(problem, forward_node, backward_node):
+        """Combines a forward path and a backward path sharing the same last node."""
+        solution = forward_node.solution()
+        solution.extend(backward_node.solution())
+        return solution
+
 import logging
         
 def log_evolution(problem, solution):

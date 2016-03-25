@@ -3,6 +3,13 @@ import numpy as np
 from random import choice
 
 class Fifteen_problem():
+    """
+    Classic sliding blocks puzzle.
+    The objective is to arrange the tiles to form
+    0 1 2 Where 0 is a blank.
+    5 4 3
+    6 7 8
+    """
     def __init__(self, state = None, size = 3):
         self.size = len(state) if state else size                
         self.goal = Fifteen_puzzle_state(wiggle(range(self.size**2)))
@@ -51,11 +58,14 @@ class Fifteen_problem():
         new_state[x][y], new_state[x+d1][y+d2] = new_state[x+d1][y+d2], new_state[x][y]
         return Fifteen_puzzle_state(tuple([tuple(row) for row in new_state]))
     
-    def reverse_action(self, node):
-        if node.action == "up": return "down"
-        if node.action == "down": return "up"
-        if node.action == "left": return "right"
-        if node.action == "right": return "left"
+    def reverse_action(self, state, action):
+        """
+        returns the action which cancels the effect of action on state
+        """
+        if action == "up": return "down"
+        if action == "down": return "up"
+        if action == "left": return "right"
+        if action == "right": return "left"
     
     def __repr__(self):
         return "{}-problem\ninit=\n{}".format(self.size**2-1, self.initial_state)
