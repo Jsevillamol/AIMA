@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+from random import choice
 
 class Fifteen_problem():
     def __init__(self, state = None, size = 3):
-        self.size = len(state) if state else size
+        self.size = len(state) if state else size                
+        self.goal = Fifteen_puzzle_state(wiggle(range(self.size**2)))
+        
         if state == None: self.generate_solvable_state()
         else:
             self.initial_state = Fifteen_puzzle_state(state)
             if not self.solvable(): 
                 raise Unsolvable
-                
-        self.goal = Fifteen_puzzle_state(wiggle(range(self.size**2)))
 
-    def solvable(self):
+    def solvable(self):#Does not work
         perm = list(sum(self.initial_state, ()))
         perm = list(sum(wiggle(perm),()))
         perm.remove(0)
@@ -21,10 +22,13 @@ class Fifteen_problem():
         
         
     def generate_solvable_state(self):
-        while True:
+        """while True:
             permutation = tuple(np.random.permutation(self.size*self.size))
             self.initial_state = Fifteen_puzzle_state(wiggle(permutation))
-            if(self.solvable()): break
+            if(self.solvable()): break"""
+        self.initial_state = self.goal
+        for i in range(50):
+            self.initial_state = self.result(self.initial_state,choice(self.actions(self.initial_state)))
     
     def goal_test(self, state)->bool:
         return state == self.goal      
@@ -46,6 +50,12 @@ class Fifteen_problem():
         d1,d2 = directions[action]
         new_state[x][y], new_state[x+d1][y+d2] = new_state[x+d1][y+d2], new_state[x][y]
         return Fifteen_puzzle_state(tuple([tuple(row) for row in new_state]))
+    
+    def reverse_action(self, node):
+        if node.action == "up": return "down"
+        if node.action == "down": return "up"
+        if node.action == "left": return "right"
+        if node.action == "right": return "left"
     
     def __repr__(self):
         return "{}-problem\ninit=\n{}".format(self.size**2-1, self.initial_state)

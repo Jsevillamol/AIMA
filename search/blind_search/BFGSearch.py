@@ -23,7 +23,7 @@ def BFGSearch(problem):
                 frontier.append(child)
     return None
     
-if True:#__name__ == "__Main__":
+if False:#__name__ == "__Main__":
     from problems.fifteen_problem import Fifteen_problem, Fifteen_puzzle_state
     import logging
     logging.basicConfig(filename='BFGSearch.log',level=logging.DEBUG)

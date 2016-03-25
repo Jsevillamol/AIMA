@@ -21,6 +21,14 @@ class Node():
         node.action = action
         node.path_cost = self.path_cost + problem.cost(self.state, action)
         return node
+    
+    def parent(self, problem, action):
+        """Creates a parent for backward search"""
+        node = Node()
+        node.state = problem.result(self.state, action)
+        node.child = self
+        node.action = action
+        return node
         
     def solution(self):
         """Returns the chain of actions which leads to this node"""
@@ -31,6 +39,14 @@ class Node():
             node = node.parent
         return solution
     
+    def compose_solution(problem, forward_node, backward_node):
+        """combines a forward path and a backward path sharing the same last node"""
+        aux = backward_node
+        while aux.child != None:
+            node = forward_node.child(problem, problem.reverse(backward_node))
+            aux = backward_node.child
+        return node
+        
     def reverse_path(self):
         """generates the reverse path that leads to this node"""
         node = self
