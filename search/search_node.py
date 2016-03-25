@@ -66,19 +66,22 @@ class Node():
             self.state, self.path_cost, self.solution())
 
 class Reverse_node():
+    """
+    Nodes which store a path to a goal_state
+    """
     def __init__(self, problem = None):
-        self.state = problem and problem.goal
+        self.state = problem and problem.goal_state
         self.child = None
         self.action = None
-        self.path_cost = 0    
+        self.path_cost = 0
     
-    def parent(self, problem, action):
+    def parent(self, problem, parent_state, action):
         """Creates a parent for backward search."""
-        node = Node()
-        node.state = problem.result(self.state, action)
+        node = Reverse_node()
+        node.state = parent_state
         node.child = self
-        node.action = problem.reverse_action(self.state, action)
-        node.path_cost = self.path_cost + problem.cost(node.state, node.action)
+        node.action = action
+        node.path_cost = self.path_cost + problem.cost(parent_state, action)
         return node
     
     def solution(self):
@@ -89,13 +92,14 @@ class Reverse_node():
         node = self
         while node.child != None:
             solution.append(node.action)
+            node = node.child
         return solution
         
     def __repr__(self):
         return "state:{}, path_cost:{}, path:{}".format(
             self.state, self.path_cost, self.solution())
 
-def compose_solution(problem, forward_node, backward_node):
+def compose_solution(forward_node, backward_node):
         """Combines a forward path and a backward path sharing the same last node."""
         solution = forward_node.solution()
         solution.extend(backward_node.solution())
@@ -111,5 +115,5 @@ def log_evolution(problem, solution):
     for act in solution:
         state = problem.result(state,act)
         logging.info("Action= {}".format(act))
-        logging.info("\n", state)
+        logging.info(state)
 

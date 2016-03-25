@@ -2,7 +2,9 @@
 import numpy as np
 from random import choice
 
-class Fifteen_problem():
+from problems.problem import Problem
+
+class Fifteen_problem(Problem):
     """
     Classic sliding blocks puzzle.
     The objective is to arrange the tiles to form
@@ -10,9 +12,10 @@ class Fifteen_problem():
     5 4 3
     6 7 8
     """
-    def __init__(self, state = None, size = 3):
-        self.size = len(state) if state else size                
-        self.goal = Fifteen_puzzle_state(wiggle(range(self.size**2)))
+    def __init__(self, state = None, size = 3, difficulty=10):
+        self.size = len(state) if state else size     
+        self.difficulty = difficulty     
+        self.goal_state = Fifteen_puzzle_state(wiggle(range(self.size**2)))
         
         if state == None: self.generate_solvable_state()
         else:
@@ -33,20 +36,18 @@ class Fifteen_problem():
             permutation = tuple(np.random.permutation(self.size*self.size))
             self.initial_state = Fifteen_puzzle_state(wiggle(permutation))
             if(self.solvable()): break"""
-        self.initial_state = self.goal
-        for i in range(50):
-            self.initial_state = self.result(self.initial_state,choice(self.actions(self.initial_state)))
+        self.initial_state = self.goal_state
+        for i in range(self.difficulty):
+            self.initial_state = self.result(self.initial_state,choice(list(self.actions(self.initial_state))))
     
     def goal_test(self, state)->bool:
-        return state == self.goal      
+        return state == self.goal_state      
     
     def actions(self, state):
         (x,y) = index_2d(state, 0)
-        actions = []
         for direction, (d1,d2) in directions.items():
             if 0<=x+d1<self.size and 0<=y+d2<self.size:
-                actions.append(direction)
-        return actions
+                yield direction
         
     def cost(self, state, action):
         return 1
@@ -57,6 +58,13 @@ class Fifteen_problem():
         d1,d2 = directions[action]
         new_state[x][y], new_state[x+d1][y+d2] = new_state[x+d1][y+d2], new_state[x][y]
         return Fifteen_puzzle_state(tuple([tuple(row) for row in new_state]))
+    
+    def predecessors(self, state):
+        (x,y) = index_2d(state, 0)
+        for direction, (d1,d2) in directions.items():
+            if 0<=x+d1<self.size and 0<=y+d2<self.size:
+                yield (self.result(state, direction), self.reverse_action(state, direction))
+        
     
     def reverse_action(self, state, action):
         """

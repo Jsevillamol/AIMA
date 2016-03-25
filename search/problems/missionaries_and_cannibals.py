@@ -7,12 +7,12 @@ class Missionaries_and_Cannibals:
     right = False
     def __init__(self, size = 3, boat_size = 2):
         self.initial_state = MaC_state(((size,size), (0,0)), MaC.left)
-        self.goal = MaC_state(((0,0), (size,size)), MaC.right)
+        self.goal_state = MaC_state(((0,0), (size,size)), MaC.right)
         self.size = size
         self.boat_size = boat_size
         
     def goal_test(self, state)->bool:
-        return state == self.goal
+        return state == self.goal_state
     
     def actions(self, state):
         actions = []

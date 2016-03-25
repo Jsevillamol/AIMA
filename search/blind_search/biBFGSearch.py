@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from collections import deque
-from search_node import Node
+from search_node import Node, Reverse_node, compose_solution
 
 def biBFGSearch(problem):
     """
@@ -21,8 +21,7 @@ def biBFGSearch(problem):
     init_frontier_set = set()
     init_frontier_set.add(initial_node.state)
     
-    goal_node = Node()
-    goal_node.state = problem.goal
+    goal_node = Reverse_node(problem)
     
     goal_frontier = deque()
     goal_frontier.append(goal_node)
@@ -43,7 +42,7 @@ def biBFGSearch(problem):
                 child = node.child(problem, action)
                 if child.state in goal_frontier_set:
                     return compose_solution(
-                        problem, child, pick(goal_frontier, child.state))
+                        child, pick(goal_frontier, child.state))
                 if not child.state in explored and \
                 not child.state in init_frontier_set:
                     other_init_frontier.append(child)
@@ -57,23 +56,18 @@ def biBFGSearch(problem):
             node = goal_frontier.popleft()
             goal_frontier_set.remove(node.state)
             explored.add(node.state)
-            for action in problem.actions(node.state):
-                child = node.child(problem,action)
-                if child.state in init_frontier_set:
+            for state, action in problem.predecessors(node.state):
+                parent = node.parent(problem, state, action)
+                if parent.state in init_frontier_set:
                     return compose_solution(
-                        problem, pick(init_frontier, child.state), child)
-                if not child.state in explored and \
-                not child.state in goal_frontier_set:
-                    other_goal_frontier.append(child)
-                    goal_frontier_set.add(child.state)
+                        pick(init_frontier, parent.state), parent)
+                if not parent.state in explored and \
+                not parent.state in goal_frontier_set:
+                    other_goal_frontier.append(parent)
+                    goal_frontier_set.add(parent.state)
         goal_frontier = other_goal_frontier
         
     return None
-
-def compose_solution(problem, forward_node, backward_node):
-    solution = forward_node.solution()
-    solution.extend((problem.reverse(node) for node in backward_node.reverse_path()))
-    return solution
     
 
 def pick(deque, state):
@@ -89,11 +83,12 @@ if True:
     import logging
     from problems.fifteen_problem import Fifteen_problem
     from BFGSearch import BFGSearch
-    logging.basicConfig(filename='biBFGSearch.log',level=logging.INFO)
+    logging.basicConfig(filename='biBFGSearch.log',level=logging.DEBUG)
     for i in range(10):
-        p = Fifteen_problem(size=3)
+        p = Fifteen_problem(size=3, difficulty=50)
         ins = p.initial_state
         logging.info("about to start instance\n {}.\nSolvable: {}".format(p.initial_state, p.solvable()))
+        logging.debug("Tuple representation: {}".format(p.initial_state.state))        
         logging.info("BFGSearch")
         solution = BFGSearch(p)
         logging.info("The solution is {}. Depth:{}".format(solution, len(solution)))
