@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-class Test_problem():
+from problem import Problem
+
+class Test_problem(Problem):
     """
     Problem for testing.
     The initial state is 0. Actions are sum 1, sum 2 or sum 3.
@@ -28,16 +30,5 @@ class Test_problem():
         """
         return state + action    
     
-    def valid(self, state, action)->bool:
-        """
-        Returns true if action is applicable to state
-        """
-        return True
-        
-    def cost(self, state, action):
-        """
-        Returns the cost of applying action to state
-        """
-        return 1
     
     
