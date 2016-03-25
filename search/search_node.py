@@ -65,5 +65,15 @@ class Node():
         return "state:{}, path_cost:{}, path:{}".format(
             self.state, self.path_cost, self.solution())
         
-
+import logging
+        
+def log_evolution(problem, solution):
+    logging.basicConfig(filename='problemEvo.log',level=logging.DEBUG)
+    logging.info(problem)
+    logging.info(problem.initial_state)
+    state = problem.initial_state
+    for act in solution:
+        state = problem.result(state,act)
+        logging.info("Action= {}".format(act))
+        logging.info("\n", state)
 

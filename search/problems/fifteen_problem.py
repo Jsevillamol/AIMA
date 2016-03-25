@@ -3,28 +3,27 @@ import numpy as np
 
 class Fifteen_problem():
     def __init__(self, state = None, size = 3):
-        self.size = size
+        self.size = len(state) if state else size
         if state == None: self.generate_solvable_state()
         else:
-            self.initial_state = state
-            self.size = len(state)
+            self.initial_state = Fifteen_puzzle_state(state)
             if not self.solvable(): 
-                raise "UnsolvablePuzzle"
+                raise Unsolvable
                 
-        self.goal = tuple([tuple(range(i*self.size,i*self.size+self.size)) 
-                     for i in range(self.size)])
+        self.goal = Fifteen_puzzle_state(wiggle(range(self.size**2)))
 
     def solvable(self):
-        perm = sum(self.initial_state, ())
-        #This could be very wrong
-        return (parity(perm) + index_2d(self.initial_state, 0)[0] + self.size)%2 == 0
-            
-        return True
+        perm = list(sum(self.initial_state, ()))
+        perm = list(sum(wiggle(perm),()))
+        perm.remove(0)
+        
+        return parity(perm)==0
+        
         
     def generate_solvable_state(self):
         while True:
             permutation = tuple(np.random.permutation(self.size*self.size))
-            self.initial_state = tuple([permutation[i*self.size:i*self.size+self.size] for i in range(self.size)])
+            self.initial_state = Fifteen_puzzle_state(wiggle(permutation))
             if(self.solvable()): break
     
     def goal_test(self, state)->bool:
@@ -46,8 +45,11 @@ class Fifteen_problem():
         x,y = index_2d(new_state,0)
         d1,d2 = directions[action]
         new_state[x][y], new_state[x+d1][y+d2] = new_state[x+d1][y+d2], new_state[x][y]
-        return tuple([tuple(row) for row in new_state])
-
+        return Fifteen_puzzle_state(tuple([tuple(row) for row in new_state]))
+    
+    def __repr__(self):
+        return "{}-problem\ninit=\n{}".format(self.size**2-1, self.initial_state)
+    
 directions = {
         "up":    ( 1, 0),
         "down":  (-1, 0),
@@ -55,17 +57,50 @@ directions = {
         "left":  ( 0, 1)
     }
 
+class Fifteen_puzzle_state:
+    def __init__(self, state):
+        self.state = state
+    
+    def __repr__(self):
+        s = "---"*len(self.state) +"\n|"
+        for i in range(len(self.state)):
+            for j in range(len(self.state)):
+                s += "{:2d}|".format(self.state[i][j])
+            s += "\n"+"---"*len(self.state) +"\n|"
+        return s[:-1]
+    
+    def __getitem__(self, index):
+        return self.state[index]
+    
+    def __eq__(self, other):
+        if not isinstance(other, Fifteen_puzzle_state): raise NotImplemented
+        return self.state == other.state
+    
+    def __hash__(self):
+        return hash(self.state)
+
+class Unsolvable(Exception):
+    pass
+
 def parity(permutation):
     to_visit = list(range(len(permutation)))
     parity = 0
     while to_visit:
         aux = to_visit.pop()
-        while(permutation[aux] in to_visit):
+        while(permutation[aux-1] in to_visit):
             parity += 1
-            aux = permutation[aux]
+            aux = permutation[aux-1]
             to_visit.remove(aux)
     return parity%2
-    
+
+import math
+
+def wiggle(l):
+    s = int(math.sqrt(len(l)))
+    return tuple([tuple(l[i*s:(i+1)*s]) if i%2==0 
+             else tuple(l[(i+1)*s-1:i*s-1:-1])
+             for i in range(s)])
+
 def index_2d(myList, v):
     for i, x in enumerate(myList):
         if v in x:
