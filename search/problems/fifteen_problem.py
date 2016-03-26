@@ -111,11 +111,11 @@ class Unsolvable(Exception):
     pass
 
 def parity(permutation):
-    to_visit = list(range(len(permutation)))
+    to_visit = set(range(1, len(permutation)+1))
     parity = 0
     while to_visit:
-        aux = to_visit.pop()
-        while(permutation[aux-1] in to_visit):
+        init = aux = to_visit.pop()
+        while permutation[aux-1] != init:
             parity += 1
             aux = permutation[aux-1]
             to_visit.remove(aux)
