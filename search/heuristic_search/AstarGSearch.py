@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 26 01:05:40 2016
+Created on Sat Mar 26 17:13:39 2016
 
 @author: jsevillamol
 """
 
 from search_node import Node, Priority_Queue
 
-def GBFSearch(problem): #Untested
+def AstarGSearch(problem): #Untested
     """
-    Greedy Best-First Search
+    A* Graph Search
     """
     initial_node = Node(problem)
     if problem.goal_test(problem.initial_state): 
@@ -26,7 +26,6 @@ def GBFSearch(problem): #Untested
         for action in problem.actions(node.state):
             child = node.child(problem,action)
             if not child.state in explored: 
-                frontier.push(child, problem.h(child.state))
+                frontier.push(child, child.path_cost + problem.h(child.state))
         
     return None
-    

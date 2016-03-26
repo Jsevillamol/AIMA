@@ -57,6 +57,22 @@ class Problem():
         """
         raise NotImplemented
     
+    def h(self, state)   :
+        """
+        Returns a heuristic cost for a state.
+        
+        By default is 0.
+        
+        In order to work with Heuristic Tree Search should be admissible:
+        the heuristic cost must be a lower bound of an optimal path leading 
+        from state to a goal state.
+        
+        In order to work with Heuristic Graph Searchs h should be consistent:
+        h(n) <= c(n,n') + h(n'), where n is a node, c is the step cost function
+        and n' a successor of n.
+        """
+        return 0
+    
     def __repr__(self)->str:
         """
         Returns the name of the problem, plus additional info

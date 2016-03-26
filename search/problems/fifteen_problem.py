@@ -23,7 +23,7 @@ class Fifteen_problem(Problem):
             if not self.solvable(): 
                 raise Unsolvable
 
-    def solvable(self):#Does not work
+    def solvable(self):#Works I think?
         perm = list(sum(self.initial_state, ()))
         perm = list(sum(wiggle(perm),()))
         perm.remove(0)
@@ -75,6 +75,14 @@ class Fifteen_problem(Problem):
         if action == "left": return "right"
         if action == "right": return "left"
     
+    def h(self,state):
+        manhattan_d = 0
+        for x,y in coords(self.size):
+            if state[x][y] != 0:
+                i,j = index_2d(self.goal_state, state[x][y])
+                manhattan_d += abs(x-i) + abs(y-j)
+        return manhattan_d
+    
     def __repr__(self):
         return "{}-problem\ninit=\n{}".format(self.size**2-1, self.initial_state)
     
@@ -84,6 +92,9 @@ directions = {
         "right": ( 0,-1),
         "left":  ( 0, 1)
     }
+
+def coords(size):
+    return ((x,y) for x in range(size) for y in range(size))
 
 class Fifteen_puzzle_state:
     def __init__(self, state):
