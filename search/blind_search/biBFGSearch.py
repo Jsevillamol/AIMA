@@ -82,16 +82,12 @@ class NoSuchElement(Exception):
 if True:
     import logging
     from problems.fifteen_problem import Fifteen_problem
-    from BFGSearch import BFGSearch
     logging.basicConfig(filename='biBFGSearch.log',level=logging.DEBUG)
     for i in range(10):
-        p = Fifteen_problem(size=3, difficulty=50)
+        p = Fifteen_problem(size=4, difficulty=100)
         ins = p.initial_state
         logging.info("about to start instance\n {}.\nSolvable: {}".format(p.initial_state, p.solvable()))
-        logging.debug("Tuple representation: {}".format(p.initial_state.state))        
-        logging.info("BFGSearch")
-        solution = BFGSearch(p)
-        logging.info("The solution is {}. Depth:{}".format(solution, len(solution)))
+        logging.debug("Tuple representation: {}".format(p.initial_state.state))      
         logging.info("biBFGSearch")
         solution = biBFGSearch(p)
         logging.info("The solution is {}. Depth:{}".format(solution, len(solution)))

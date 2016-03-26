@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
 def UCGSearch(problem):
-    initial_node = Node(problem.initial_state)
-    if goal(initial_state): return initial_node
-    frontier = [initial_node] #Maybe use a set
+    initial_node = Node(problem)
+    if goal(initial_state): return initial_node.solution()
+    
+    frontier = Priority_Queue()
+    frontier.push(initial_node)
+    
     while(not frontier.empty()):
         node = frontier.pop_max()
         if goal(node.state): return node
@@ -17,3 +20,4 @@ def UCGSearch(problem):
                     frontier child = child
         
     return None
+

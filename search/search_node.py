@@ -117,3 +117,76 @@ def log_evolution(problem, solution):
         logging.info("Action= {}".format(act))
         logging.info(state)
 
+import heapq
+import itertools
+class Priority_Queue:
+    """
+    Priority Queue for Search_nodes with efficient membership test.
+    Returns node with lower f-cost on pop.
+    If a repeated node is inserted, only the one with lower f-cost is retained.
+    Keeps track of # of nodes processed through index.
+    """
+    REMOVED = '<removed-node>'
+    def __init__(self):
+        """
+        Constructs a new queue.
+        Cost: constant
+        """
+        self._queue = []
+        self._node_finder = {}
+        self._index = itertools.count()
+        self._n = 0
+    
+    def push(self, node, f_cost):
+        """
+        Adds node to queue. 
+        If there is another node with the same state but higher f-cost, it is
+        replaced.
+        """
+        if node in self:
+            old_f_cost, index, old_node = self._node_finder[node.state]
+            if old_f_cost > f_cost:
+                self.remove(node)
+                entry = [f_cost, next(self._index), node]
+                self._node_finder[node.state] = entry
+                heapq.heappush(self._queue, entry)
+                self._n += 1
+            
+        else:
+            entry = [f_cost, next(self._index), node]
+            self._node_finder[node.state] = entry
+            heapq.heappush(self._queue, entry)
+            self._n+=1
+    
+    def remove(self, node):
+        """
+        Removes node with same state as arg
+        """
+        entry = self._node_finder.pop(node.state)
+        entry[-1] = Priority_Queue.REMOVED
+        self._n -= 1
+    
+    def pop(self):
+        while self._queue:
+            entry = heapq.heappop(self._queue)
+            if entry[-1] is not Priority_Queue.REMOVED:
+                node = entry[-1]
+                self.remove(node)
+                return node
+        raise KeyError("Empty queue!")
+            
+    def __len__(self):
+        return self._n
+    
+    def __contains__(self, node):
+        return node.state in self._node_finder
+    """
+    def __nonzero__(self):
+        while self._queue and self._queue[0][-1] is Priority_Queue.REMOVED:
+            heapq.heappop(self._queue)
+        return bool(self._queue)"""
+    
+    def __repr__(self):
+        return repr(self._queue)
+    
+    
