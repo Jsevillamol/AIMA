@@ -28,9 +28,9 @@ class Fifteen_problem(Problem):
         perm = list(sum(wiggle(perm),()))
         perm.remove(0)
         
-        return parity(perm)==0
+        return (parity(perm) + index_2d(self.initial_state, 0)[0]*(self.size-1))%2==0
         
-        
+    
     def generate_solvable_state(self):
         """while True:
             permutation = tuple(np.random.permutation(self.size*self.size))
@@ -144,3 +144,4 @@ def index_2d(myList, v):
     for i, x in enumerate(myList):
         if v in x:
             return (i, x.index(v))
+    raise KeyError
