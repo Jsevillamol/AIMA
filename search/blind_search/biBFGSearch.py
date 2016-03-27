@@ -12,6 +12,7 @@ def biBFGSearch(problem):
     Or None if no such solution exists
     
     """
+    Node.reset()
     initial_node = Node(problem)
     if problem.goal_test(problem.initial_state):
         return initial_node.solution()
@@ -36,6 +37,7 @@ def biBFGSearch(problem):
         #We explore the next depth and then pass the baton
         while init_frontier:
             node = init_frontier.popleft()
+            Node.count()
             init_frontier_set.remove(node.state)
             explored.add(node.state)
             for action in problem.actions(node.state):
@@ -54,6 +56,7 @@ def biBFGSearch(problem):
         #We explore the next depth and then pass the baton
         while goal_frontier:
             node = goal_frontier.popleft()
+            Node.count()
             goal_frontier_set.remove(node.state)
             explored.add(node.state)
             for state, action in problem.predecessors(node.state):
@@ -79,16 +82,5 @@ def pick(deque, state):
 class NoSuchElement(Exception):
     pass
 
-if True:
-    import logging
-    from problems.fifteen_problem import Fifteen_problem
-    logging.basicConfig(filename='biBFGSearch.log',level=logging.DEBUG)
-    for i in range(10):
-        p = Fifteen_problem(size=4, difficulty=100)
-        ins = p.initial_state
-        logging.info("about to start instance\n {}.\nSolvable: {}".format(p.initial_state, p.solvable()))
-        logging.debug("Tuple representation: {}".format(p.initial_state.state))      
-        logging.info("biBFGSearch")
-        solution = biBFGSearch(p)
-        logging.info("The solution is {}. Depth:{}".format(solution, len(solution)))
+
         

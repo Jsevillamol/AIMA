@@ -12,6 +12,7 @@ class Node():
         self.parent = None
         self.action = None
         self.path_cost = 0
+        self.f_value = problem.h(self.state) if problem else None
     
     def child(self, problem, action):
         """Creates a child node of self applying specified action"""
@@ -20,6 +21,7 @@ class Node():
         node.parent = self
         node.action = action
         node.path_cost = self.path_cost + problem.cost(self.state, action)
+        node.f_value = node.path_cost + problem.h(node.state)
         return node
         
     def solution(self):
@@ -62,8 +64,15 @@ class Node():
         return self
     
     def __repr__(self):
-        return "state:{}, path_cost:{}, path:{}".format(
-            self.state, self.path_cost, self.solution())
+        return "state:{}, path_cost:{}, f_value:{}, path:{}".format(
+            self.state, self.path_cost, self.f_value, self.solution())
+    
+    node_count = None
+    def count():
+        Node.node_count+=1
+        
+    def reset():
+        Node.node_count = 0
 
 class Reverse_node():
     """

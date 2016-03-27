@@ -11,6 +11,8 @@ def AstarGSearch(problem): #Untested
     """
     A* Graph Search
     """
+    Node.reset()    
+    
     initial_node = Node(problem)
     if problem.goal_test(problem.initial_state): 
         return initial_node.solution()
@@ -21,6 +23,7 @@ def AstarGSearch(problem): #Untested
     
     while frontier:
         node = frontier.pop()
+        Node.count()
         if problem.goal_test(node.state): return node.solution()
         explored.add(node.state)
         for action in problem.actions(node.state):
