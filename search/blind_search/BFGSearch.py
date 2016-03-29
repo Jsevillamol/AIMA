@@ -15,7 +15,7 @@ def BFGSearch(problem):
     #pdb.set_trace()
     while frontier:
         node = frontier.popleft()
-        Node.count()
+        Node.check(len(frontier)+len(explored))
         explored.add(node.state)
         for action in problem.actions(node.state):
             child = node.child(problem, action)

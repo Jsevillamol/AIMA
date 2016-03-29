@@ -11,12 +11,14 @@ def RBFSearch(problem):
     """
     Recursive Best-First Search
     """
-    def ReBFSearch(problem, node, f_limit):
-        Node.count()
+    def ReBFSearch(problem, node, f_limit, n_nodes):
+        Node.check(n_nodes)
         if problem.goal_test(node.state):
             return node.solution(), 0
         
         successors = [node.child(problem, action) for action in problem.actions(node.state)]
+        
+        n_nodes += len(successors)
         
         if not successors: return None, float("inf")    
         
@@ -27,14 +29,13 @@ def RBFSearch(problem):
             best, second_best = two_bests(successors)
             if best.f_value > f_limit:
                 return None, best.f_value
-            result, best.f_value = ReBFSearch(problem, best, min(second_best.f_value, f_limit))
+            result, best.f_value = ReBFSearch(problem, best, min(second_best.f_value, f_limit), n_nodes)
             if result is not None: return result, best.f_value    
     
     Node.reset()
-    result = ReBFSearch(problem, Node(problem), float("inf"))[0]
+    result = ReBFSearch(problem, Node(problem), float("inf"), 1)[0]
     return result
     
-
         
 def two_bests(nodes):
     m1 = m2 = Node()
@@ -46,7 +47,8 @@ def two_bests(nodes):
             else:
                 m2 = n
     return m1, m2
-        
+    
+"""
 def recursive_best_first_search(problem):
 
     def RBFS(problem, node, flimit):
@@ -74,3 +76,4 @@ def recursive_best_first_search(problem):
     node.f_value = problem.h(node.state)
     result, bestf = RBFS(problem, node, float("inf"))
     return result
+"""

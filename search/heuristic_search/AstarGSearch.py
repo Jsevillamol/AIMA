@@ -7,7 +7,7 @@ Created on Sat Mar 26 17:13:39 2016
 
 from search_node import Node, Priority_Queue
 
-def AstarGSearch(problem): #Untested
+def AstarGSearch(problem):
     """
     A* Graph Search
     """
@@ -23,7 +23,7 @@ def AstarGSearch(problem): #Untested
     
     while frontier:
         node = frontier.pop()
-        Node.count()
+        Node.check(len(frontier))
         if problem.goal_test(node.state): return node.solution()
         explored.add(node.state)
         for action in problem.actions(node.state):
@@ -32,3 +32,4 @@ def AstarGSearch(problem): #Untested
                 frontier.push(child, child.path_cost + problem.h(child.state))
         
     return None
+    

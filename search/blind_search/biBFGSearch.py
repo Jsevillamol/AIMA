@@ -37,7 +37,7 @@ def biBFGSearch(problem):
         #We explore the next depth and then pass the baton
         while init_frontier:
             node = init_frontier.popleft()
-            Node.count()
+            Node.check(len(init_frontier)+len(goal_frontier)+len(explored))
             init_frontier_set.remove(node.state)
             explored.add(node.state)
             for action in problem.actions(node.state):
@@ -56,7 +56,7 @@ def biBFGSearch(problem):
         #We explore the next depth and then pass the baton
         while goal_frontier:
             node = goal_frontier.popleft()
-            Node.count()
+            Node.check(len(init_frontier)+len(goal_frontier)+len(explored))
             goal_frontier_set.remove(node.state)
             explored.add(node.state)
             for state, action in problem.predecessors(node.state):

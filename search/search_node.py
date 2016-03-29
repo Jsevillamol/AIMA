@@ -67,12 +67,40 @@ class Node():
         return "state:{}, path_cost:{}, f_value:{}, path:{}".format(
             self.state, self.path_cost, self.f_value, self.solution())
     
+    """
+    Profiling utilities
+    """
     node_count = None
-    def count():
+    memory_used = None
+    max_nodes = None
+    def check(current_nodes):
         Node.node_count+=1
+        Node.max_nodes = max(Node.max_nodes, current_nodes)
+        current = Node.memory_usage()["rss"]
+        Node.memory_used = max(Node.memory_used, current)
         
     def reset():
         Node.node_count = 0
+        Node.max_nodes = 0
+        Node.memory_used = 0
+        
+    def memory_usage():
+        """Memory usage of the current process in kilobytes."""
+        status = None
+        result = {'peak': 0, 'rss': 0}
+        try:
+            # This will only work on systems with a /proc file system
+            # (like Linux).
+            status = open('/proc/self/status')
+            for line in status:
+                parts = line.split()
+                key = parts[0][2:-1].lower()
+                if key in result:
+                    result[key] = int(parts[1])
+        finally:
+            if status is not None:
+                status.close()
+        return result
 
 class Reverse_node():
     """

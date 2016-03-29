@@ -1,5 +1,8 @@
-.txt
-.log
-.log~
+*.data~
+*.data
+*.txt
+*.txt~
+*.log
+*.log~
 .spyderproject
 __pycache__

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 from random import choice
+from types import MethodType
 
 from problems.problem import Problem
 
@@ -9,13 +10,14 @@ class Fifteen_problem(Problem):
     Classic sliding blocks puzzle.
     The objective is to arrange the tiles to form
     0 1 2 Where 0 is a blank.
-    5 4 3
+    3 4 5
     6 7 8
     """
-    def __init__(self, state = None, size = 3, difficulty=10):
+    def __init__(self, state = None, size = 3, difficulty=10, h=lambda x,y: 0):
         self.size = len(state) if state else size     
         self.difficulty = difficulty     
         self.goal_state = Fifteen_puzzle_state(wiggle(range(self.size**2)))
+        self.h = MethodType(h, self)
         
         if state == None: self.generate_solvable_state()
         else:
@@ -25,10 +27,11 @@ class Fifteen_problem(Problem):
 
     def solvable(self):#Works I think?
         perm = list(sum(self.initial_state, ()))
-        perm = list(sum(wiggle(perm),()))
+        #perm = list(sum(wiggle(perm),()))
         perm.remove(0)
         
-        return (parity(perm) + index_2d(self.initial_state, 0)[0]*(self.size-1))%2==0
+        return parity(perm) == 0
+        #(parity(perm) + index_2d(self.initial_state, 0)[0]*(self.size-1))%2==0
         
     
     def generate_solvable_state(self):
@@ -75,7 +78,19 @@ class Fifteen_problem(Problem):
         if action == "left": return "right"
         if action == "right": return "left"
     
-    def h(self,state):
+    """
+    Heuristics
+    """
+    
+        
+    def misplaced_tiles(self, state):
+        misplaced_tiles = 0
+        for x,y in coords(self.size):
+            if state[x][y] != 0 and state[x][y]!=self.goal_state[x][y]:
+                misplaced_tiles+=1
+        return misplaced_tiles
+    
+    def manhattan_d(self,state):
         manhattan_d = 0
         for x,y in coords(self.size):
             if state[x][y] != 0:
@@ -83,8 +98,42 @@ class Fifteen_problem(Problem):
                 manhattan_d += abs(x-i) + abs(y-j)
         return manhattan_d
     
+    def gaschnig(self, state):
+        d = 0
+        to_visit = set(sum(state,()))
+        to_visit.remove(0)
+        state = [list(row) for row in state]
+        blank = index_2d(state, 0)
+        blank_goal = index_2d(self.goal_state, 0)
+        while to_visit:
+            if blank != blank_goal:
+                n = self.goal_state[blank[0]][blank[1]]
+                move_to = index_2d(state, n)
+                swap(state, blank, move_to)
+                d+=1
+                blank = move_to
+                to_visit.remove(n)
+            else:
+                n = to_visit.pop()
+                position = index_2d(state, n)
+                if  position != index_2d(self.goal_state, n):
+                    to_visit.add(n)                    
+                    swap(state, blank, position)
+                    d+=1
+                    blank = position
+        return d
+    
+    def max_heuristic(self,state):
+        return max([f(self, state) for f in Fifteen_problem.heuristics])
+    
     def __repr__(self):
         return "{}-problem\ninit=\n{}".format(self.size**2-1, self.initial_state)
+
+    heuristics = [
+        misplaced_tiles,
+        manhattan_d,
+        gaschnig
+        ]    
     
 directions = {
         "up":    ( 1, 0),
@@ -95,6 +144,9 @@ directions = {
 
 def coords(size):
     return ((x,y) for x in range(size) for y in range(size))
+
+def swap(l, a, b):
+    l[a[0]][a[1]], l[b[0]][b[1]] = l[b[0]][b[1]], l[a[0]][a[1]]
 
 class Fifteen_puzzle_state:
     def __init__(self, state):
@@ -136,7 +188,7 @@ import math
 
 def wiggle(l):
     s = int(math.sqrt(len(l)))
-    return tuple([tuple(l[i*s:(i+1)*s]) if i%2==0 
+    return tuple([tuple(l[i*s:(i+1)*s]) if True#i%2==0 
              else tuple(l[(i+1)*s-1:i*s-1:-1])
              for i in range(s)])
 

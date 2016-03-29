@@ -14,7 +14,7 @@ def BFTSearch(problem):
     frontier.append(initial_node)
     while frontier:
         node = frontier.popleft()
-        Node.count()
+        Node.check(len(frontier))
         for action in problem.actions(node.state):
             child = node.child(problem, action) 
             if problem.goal_test(child.state): 

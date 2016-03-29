@@ -13,19 +13,19 @@ def LFIDSearch(problem, l=1):
             
 def LFLDFSearch(problem, l):
     "Loop Free Limited Depth First Search"
-    return recursiveLFLDFSearch(problem, l, Node(problem), set(problem.initial_state))
+    return recursiveLFLDFSearch(problem, l, Node(problem), set(problem.initial_state), 1)
     
-def recursiveLFLDFSearch(problem, l, node, current_path):    
+def recursiveLFLDFSearch(problem, l, node, current_path, n_nodes):    
     if l == 0: return False
     else: 
-        Node.count()
+        Node.check(n_nodes)
         if problem.goal_test(node.state): return node.solution()
         cutoff = False
         for action in problem.actions(node.state):
             child = node.child(problem, action)
             if not child.state in current_path:
                 current_path.add(child.state)
-                solution = recursiveLFLDFSearch(problem, l-1, child, current_path)
+                solution = recursiveLFLDFSearch(problem, l-1, child, current_path, n_nodes+1)
                 if solution: return solution
                 elif solution == False: cutoff = True
                 current_path.remove(child.state)
