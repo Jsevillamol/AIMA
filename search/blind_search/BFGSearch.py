@@ -11,7 +11,7 @@ def BFGSearch(problem):
         return initial_node.solution()
     frontier = deque()
     frontier.append(initial_node)
-    explored = set()
+    explored = set()#states we have already explored
     #pdb.set_trace()
     while frontier:
         node = frontier.popleft()
