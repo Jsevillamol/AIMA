@@ -23,7 +23,7 @@ def AstarGSearch(problem):
     
     while frontier:
         node = frontier.pop()
-        Node.check(len(frontier))
+        Node.check(len(frontier)+len(explored))
         if problem.goal_test(node.state): return node.solution()
         explored.add(node.state)
         for action in problem.actions(node.state):

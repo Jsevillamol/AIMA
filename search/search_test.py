@@ -13,11 +13,12 @@ from heuristic_search.RBFSearch import RBFSearch
 from problems.fifteen_problem import Fifteen_problem, Fifteen_puzzle_state
 from blind_search.biBFGSearch import biBFGSearch
 from heuristic_search.AstarGSearch import AstarGSearch
+from heuristic_search.LFRBFSearch import LFRBFSearch
 
 def test():
     logging.basicConfig(filename='rbfs.log',level=logging.DEBUG)
     #to_test = [biBFGSearch, RBFSearch, AstarGSearch]
-    to_test = [RBFSearch]
+    to_test = [RBFSearch, LFRBFSearch]
     n_instances = 10
     for i in range(n_instances):
         percent = i*int(100/n_instances)
@@ -33,6 +34,7 @@ def test():
             logging.info("The solution is:\n{}.".format(solution))
             logging.info("Depth: {}\n".format(len(solution)+1))
     print("Test completed")
+    
         
 def specific_test():
     logging.basicConfig(filename='RBFSearch.log',level=logging.DEBUG)
@@ -218,30 +220,76 @@ def make_chart(brute_data, interval_data, name, h_name):
                             )
     fig.subplots_adjust(hspace=0.4, wspace=0.7)
     plt.show()
-    fig.savefig("plots/{}{}.png".format(name, h_name))
+    fig.savefig("plots/{}{}.pdf".format(name, h_name), dpi=300)
+    
+    fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(10,10))
+    
+    make_table("Time (s)", time_data, axes[0])
+    make_table("Memory (KiB)", mem_data, axes[1])
+    make_table("Nodes explored", node_data, axes[2])
+    make_table("Max nodes in memory", max_data, axes[3])
+    
+    fig.suptitle("{}{}".format(
+                            name, 
+                            "".join(
+                                [s+" " for s in h_name.split("_")])
+                                ), 
+                            fontsize=20
+                            )
+    
+    plt.show()
+    fig.savefig("plots/tables/{}{}table.pdf".format(name, h_name), dpi=300)
+
+import statistics as st
+
+def make_table(title, interval_data, ax):
+    """Make data table
+    """
+    colLabels=("Interval", "Sample Size", "Mean", "Median", "Sample Deviation")
+#    nrows, ncols = len(interval_data)+1, len(colLabels)
+#    hcell, wcell = 3, 3.
+#    hpad, wpad = 0, 0
+    #fig=plt.figure(figsize=(ncols*wcell+wpad, nrows*hcell+hpad))
+    #ax = fig.add_subplot(111)
+    ax.axis('off')
+    #do the table
+    table = [[
+                "{}-{}".format(5*i, 5*i+5), 
+                len(interval_data[i]), 
+                "{:.2E}".format(st.mean(interval_data[i])),
+                "{:.2E}".format(st.median(interval_data[i])),
+                "{:.2E}".format(st.stdev(interval_data[i]))
+             ] for i in range(len(interval_data))]
+    
+    ax.set_title(title, fontsize=15)
+    table = ax.table(cellText=table,
+              colLabels=colLabels,
+              loc='center', fontsize=12)
+    
         
     
 blind_algos = [BFTSearch, BFGSearch]#, BFTSearch
-h_algos = []#RBFSearch
-heuristics = [Fifteen_problem.manhattan_d, Fifteen_problem.max_heuristic]#Fifteen_problem.heuristics
+h_algos = [LFRBFSearch]#RBFSearch
+heuristics = [Fifteen_problem.manhattan_d] + [Fifteen_problem.max_heuristic]#Fifteen_problem.heuristics
     
 null_h = lambda x,y:0
-to_test = [(f, null_h) for f in blind_algos]
+to_test = [(f, h) for f in h_algos for h in heuristics]
         
     
 if False:
     
-    difficulties = [17]
-    n_instances = 40   
+    difficulties = [48, 57, 66, 75, 80, 81, 99, 100]
+    n_instances = 20
     
     sample(to_test, difficulties, n_instances)
 
 blind_algos = [BFTSearch, BFGSearch, LFIDSearch, biBFGSearch]#, 
-h_algos = [AstarGSearch, RBFSearch]#
+h_algos = [AstarGSearch, RBFSearch, LFRBFSearch]#
 heuristics = Fifteen_problem.heuristics + [Fifteen_problem.max_heuristic]#Fifteen_problem.heuristics
     
 null_h = lambda x,y:0
 to_test = [(f, null_h) for f in blind_algos]+[(f, h) for f in h_algos for h in heuristics]
+#to_test=[(LFIDSearch, null_h)]
 
 if True:
     with open("results.data", "r") as file:
@@ -261,7 +309,7 @@ if True:
             print("Algo:{}{}. Depth interval:{}-{}. Sample size:{}".\
                     format(name,h_name,i*5,(i+1)*5,len(s)))
         
-        depth_intervals_data =  [interval for interval in depth_intervals_data if len(interval)>0]
+        depth_intervals_data =  [interval for interval in depth_intervals_data if len(interval)>1]
         make_chart(algo_data, depth_intervals_data, name, h_name)
         #input()
         

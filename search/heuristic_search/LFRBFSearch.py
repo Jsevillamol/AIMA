@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sat Mar 26 20:10:53 2016
+Created on Thu Mar 31 21:33:50 2016
 
 @author: jsevillamol
 """
 
 from search_node import Node
 
-def RBFSearch(problem):
+def LFRBFSearch(problem):
     """
     Recursive Best-First Search
     """
@@ -17,6 +17,8 @@ def RBFSearch(problem):
             return node.solution(), 0
         
         successors = [node.child(problem, action) for action in problem.actions(node.state)]
+        path = [n.state for n in node.reverse_path()]
+        successors = [s for s in successors if not s.state in path]#Filter loopy paths
         
         n_nodes += len(successors)
         
@@ -46,4 +48,3 @@ def RBFSearch(problem):
     Node.reset()
     result = ReBFSearch(problem, Node(problem), float("inf"), 1)[0]
     return result
-    

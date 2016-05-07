@@ -11,6 +11,7 @@ class Node():
         self.state = problem and problem.initial_state
         self.parent = None
         self.action = None
+#        self.current_path = [self.state] if problem else []
         self.path_cost = 0
         self.f_value = problem.h(self.state) if problem else None
     
@@ -20,6 +21,7 @@ class Node():
         node.state = problem.result(self.state, action)
         node.parent = self
         node.action = action
+#        node.current_path = self.current_path.append(node.state)
         node.path_cost = self.path_cost + problem.cost(self.state, action)
         node.f_value = node.path_cost + problem.h(node.state)
         return node
